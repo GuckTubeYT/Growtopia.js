@@ -10,7 +10,7 @@ module.exports = {
     for (let [key, value] of main.commands) {
       if (value.requiredPerms > 0)
         if (!(value.requiredPerms & player.permissions)) continue;
-      
+
       commands.push(key);
     }
 

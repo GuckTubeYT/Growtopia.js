@@ -15,7 +15,7 @@ module.exports = {
         .string('OnConsoleMessage')
         .string('You can\'t add any more items.')
         .end();
-      
+
       main.Packet.sendPacket(peerid, p.return().data, p.return().len);
       return p.reconstruct();
     }

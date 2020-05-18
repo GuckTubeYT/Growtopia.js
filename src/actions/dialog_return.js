@@ -85,7 +85,7 @@ module.exports = function(main, packet, peerid, p) {
         .string(username)
         .string(password)
         .end();
-      
+
       main.Packet.sendPacket(peerid, p.return().data, p.return().len);
       p.reconstruct();
 

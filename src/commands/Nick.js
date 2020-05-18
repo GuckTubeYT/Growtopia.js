@@ -30,7 +30,7 @@ module.exports = {
     }
 
     player.displayName = nick;
-    
+
     nick = `\`\`\`0${nick}`;
 
     p.create()

@@ -34,7 +34,7 @@ module.exports = {
           world.items[i].background = 0;
           continue;
         }
-        
+
         world.items[i].foreground = 0;
         world.items[i].background = 0;
       }

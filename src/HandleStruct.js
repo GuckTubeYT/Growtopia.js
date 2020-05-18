@@ -29,8 +29,8 @@ module.exports = function(main, packet, peerid, p) {
             continue;
 
           if (!main.Host.isInSameWorld(peerid, peers[i]))
-            continue;        
-            
+            continue;
+
           main.Packet.sendState(peers[i]);
         }
       }
@@ -95,9 +95,9 @@ module.exports = function(main, packet, peerid, p) {
         case 6: {
           if (wings.includes(data.plantingTree))
             player.addState('canDoubleJump')
-            
+
           main.Packet.sendState(peerid);
-            
+
           player.clothes.back = data.plantingTree;
           break;
         }

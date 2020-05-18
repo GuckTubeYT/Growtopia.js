@@ -56,7 +56,7 @@ module.exports = function(main, packet, peerid, p) {
 
     item.itemID = invItem;
     item.itemCount = itemCount;
-    
+
     inv.items.push(item);
   }
 
