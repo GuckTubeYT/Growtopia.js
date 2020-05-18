@@ -5,5 +5,5 @@ module.exports = {
     player.addState('canWalkInBlocks');
 
     main.Packet.sendState(peerid);
-  }s
+  }
 };
