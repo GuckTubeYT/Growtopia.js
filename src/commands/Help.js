@@ -1,6 +1,5 @@
 module.exports = {
   name: 'help',
-  requiredPerms: 1,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     let commands = [];

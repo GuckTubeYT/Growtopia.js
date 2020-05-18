@@ -1,6 +1,6 @@
 module.exports = {
   name: 'clear',
-  requiredPerms: 1,
+  requiredPerms: 2,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     if (!arguments[0]) return;
