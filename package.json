@@ -1,0 +1,27 @@
+{
+  "name": "growtopia.js",
+  "version": "0.4.0",
+  "description": "The first ever growtopia private server coded in nodejs.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexander9673/gtps-wrapper.git"
+  },
+  "author": "_alexander#9673",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alexander9673/gtps-wrapper/issues"
+  },
+  "homepage": "https://github.com/Alexander9673/gtps-wrapper#readme",
+  "dependencies": {
+    "better-sqlite-pool": "^0.3.0",
+    "enmap": "^5.2.4",
+    "restana": "^4.3.4"
+  }
+}
