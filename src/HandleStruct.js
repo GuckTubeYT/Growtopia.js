@@ -128,7 +128,14 @@ module.exports = function(main, packet, peerid, p) {
       if (main.getItems().get(data.plantingTree).actionType === 20) return;
 
       if (data.plantingTree === 18) {
-        let block = world.items[x + (y * world.width)].foreground;
+        let block;
+        
+        if (world.items[x + (y * world.width)].background > 0)
+          block = world.items[x + (y * world.width)].background;
+        else if (world.items[x + (y * world.width)].foreground > 0)
+          block = world.items[x + (y * world.width)].foreground;
+
+        let type = main.getItems().get(block).actionType;
 
         if (block === 6) return main.Packet.sendNothing(peerid, x, y);
 
@@ -143,7 +150,11 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-        world.items[x + (y * world.width)].foreground = 0;
+        
+        if (type === 18)
+          world.items[x + (y * world.width)].background = 0;
+        else if (type === 17)
+          world.items[x + (y * world.width)].foreground = 0;
       } else {
         let items = player.inventory.items;
         for (let i = 0; i < items.length; i++) {

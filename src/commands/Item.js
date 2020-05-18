@@ -2,6 +2,7 @@ const InventoryItem = require('../structs/InventoryItem');
 
 module.exports = {
   name: 'item',
+  requiredPerms: 1,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     let inv = main.players.get(peerid).inventory;
