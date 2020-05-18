@@ -1,11 +1,9 @@
 module.exports = {
   name: 'help',
-  requiredPerms: 0,
+  requiredPerms: 1,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     let commands = [];
-
-    //console.log(value.requiredPerms & player.permissions)
 
     for (let [key, value] of main.commands) {
       if (value.requiredPerms > 0)
