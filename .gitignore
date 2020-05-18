@@ -103,18 +103,15 @@ dist
 # TernJS port file
 .tern-port
 
-# test file
+# Test file
 test.js
 
-# package-lock
+# Package-lock
 package-lock.json
 
-# enmap db
+# Enmap
 data
 
-# ietms.dat decoded
-test.json
+# Item database
+items.json
 items.dat
-
-# test file
-c.js

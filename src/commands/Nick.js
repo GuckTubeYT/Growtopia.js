@@ -2,7 +2,7 @@ const Constants = require('../structs/Constants');
 
 module.exports = {
   name: 'nick',
-  requiredPerms: 1,
+  requiredPerms: 2,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     let nick = arguments.join(' ');
