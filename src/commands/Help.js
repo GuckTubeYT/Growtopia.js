@@ -5,10 +5,8 @@ module.exports = {
     let commands = [];
 
     for (let [key, value] of main.commands) {
-      if (value.requiredPerms > 0)
-        if (!(value.requiredPerms & player.permissions)) continue;
-
-      commands.push(key);
+      if ((value.requiredPerms & player.permissions) || value.requiredPerms === 0 || player.permissions > value.requiredPerms)
+        commands.push(key);
     }
 
     p.create()

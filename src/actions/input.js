@@ -11,7 +11,7 @@ module.exports = function(main, packet, peerid, p) {
 
       if (main.commands.has(command)) {
         let cmd = main.commands.get(command);
-        if ((cmd.requiredPerms & player.permissions) > 0 || (cmd.requiredPerms || 0) === 0)
+        if ((cmd.requiredPerms & player.permissions) || cmd.requiredPerms === 0 || player.permissions > cmd.requiredPerms)
           return cmd.run(main, arguments, peerid, p);
         else {
           p.create()

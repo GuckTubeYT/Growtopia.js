@@ -41,6 +41,9 @@ class Main extends EventEmitter {
 
     for (let i = 0; i < files.length; i++) {
       let file = require(`${this.commandsDir}/${files[i]}`);
+      if (!file.requiredPerms && isNaN(file.requiredPerms))
+        file.requiredPerms = 0;
+        
       this.commands.set(file.name, file);
 
       console.log(`Loaded ${file.name} command`);

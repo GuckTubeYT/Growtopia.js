@@ -463,6 +463,7 @@ class Packet {
         packet.writeIntLE(player.netID, 8, 4);
 
         this.sendPacket(peer, packet, p.return().len);
+        this.sendSound(peer, "audio/change_clothes.wav", 0);
       }
     }
 
@@ -523,6 +524,17 @@ class Packet {
     data.punchY = y;
 
     this.sendPacketRaw(peerid, 4, this.packPlayerMoving(data), 56, 0);
+  }
+
+  sendSound(peer, file, delay) {
+    let string = `action|play_sfx\nfile|${file}\ndelayMS|${delay}`;
+    let data = Buffer.alloc(5 + string.length);
+
+    data.writeIntLE(3, 0, 4);
+    data.write(string, 4, string.length);
+    data.writeIntLE(0, string.length + 4, 1);
+
+    this.sendPacket(peer, data, data.length);
   }
 };
 

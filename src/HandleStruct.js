@@ -1,4 +1,5 @@
 const Packet = require('./Packet');
+const Constants = require('./structs/Constants');
 const wings = [156, 350, 362, 678, 736, 818, 1166, 1206, 1460, 1550, 1574, 1672, 1674, 1738, 1780, 1784, 1824, 1934, 1936, 1938, 1970, 2158, 2160, 2162, 2164, 2166, 2168, 2254, 2256, 2258, 2260, 2262, 2264, 2438, 2538, 2642, 2722, 2776, 2930, 2932, 2982, 3104, 3112, 3114, 3120, 3134, 3134, 3144, 3308, 3442, 3512, 3858, 4184, 4412, 4414, 4534, 4628, 4970, 4972, 4986, 5020, 5322, 5738, 5754, 6004, 6144, 6284, 6334, 6694, 6758, 6818, 6842, 7104, 7350, 7582, 9394];
 
 module.exports = function(main, packet, peerid, p) {
@@ -54,6 +55,7 @@ module.exports = function(main, packet, peerid, p) {
     case 7: {
       PacketHandler.sendPlayerLeave(peerid);
       PacketHandler.requestWorldSelect(peerid);
+      main.Packet.sendSound(peerid, "audio/door_shut.wav", 0);
       break;
     }
 
@@ -129,17 +131,21 @@ module.exports = function(main, packet, peerid, p) {
 
       if (data.plantingTree === 18) {
         let block;
-
+        
         if (world.items[x + (y * world.width)].background > 0)
           block = world.items[x + (y * world.width)].background;
-        else if (world.items[x + (y * world.width)].foreground > 0)
+        
+        if (world.items[x + (y * world.width)].foreground > 0)
           block = world.items[x + (y * world.width)].foreground;
 
-        let type = main.getItems().get(block).actionType;
+        let type = main.getItems().get(block);
+        if (!type) return;
+
+        type = type.actionType;
 
         if (block === 6) return main.Packet.sendNothing(peerid, x, y);
 
-        if (block === 8) {
+        if (block === 8 && !(player.permissions & Constants.Permissions.admin)) {
           p.create()
             .string('OnTalkBubble')
             .intx(player.netID)
@@ -150,10 +156,10 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-
+        
         if (type === 18)
           world.items[x + (y * world.width)].background = 0;
-        else if (type === 17)
+        else if (type === 17 ||type === 15)
           world.items[x + (y * world.width)].foreground = 0;
       } else {
         let items = player.inventory.items;
@@ -168,10 +174,21 @@ module.exports = function(main, packet, peerid, p) {
         }
 
         player.inventory.items = items;
+        let blockType = main.getItems().get(data.plantingTree).actionType;
 
-        if (main.getItems().get(data.plantingTree).actionType === 18) {
+        if (blockType === 18) {
           world.items[x + (y * world.width)].background = data.plantingTree;
         } else {
+          if (blockType === 15 && !(Constants.Permissions.admin & player.permissions)) {
+            p.create()
+              .string('OnTalkBubble')
+              .string('You can\'t do that')
+              .end();
+
+            main.Packet.sendPacket(peerid, p.return().data, p.return().len);
+            return p.reconstruct();
+          }
+
           world.items[x + (y * world.width)].foreground = data.plantingTree;
         }
       }
@@ -184,9 +201,8 @@ module.exports = function(main, packet, peerid, p) {
         if (!main.Host.checkIfConnected(peer))
           continue;
 
-        if (main.Host.isInSameWorld(peerid, peer)) {
+        if (main.Host.isInSameWorld(peerid, peer))
           main.Packet.sendPacketRaw(peer, 4, main.Packet.packPlayerMoving(data), 56, 0);
-        }
       }
       break;
     }

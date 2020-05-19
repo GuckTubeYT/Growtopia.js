@@ -50,7 +50,7 @@ module.exports = {
       for (let i = 0; i < split.length; i++) {
         let vsplit = split[i];
         if (vsplit.startsWith('|')) {
-           vsplit = vsplit.slice(1, vsplit.length - 1);
+           vsplit = vsplit.substring(1);
         }
 
         let value = vsplit.split('|')[1];
@@ -60,7 +60,7 @@ module.exports = {
           if (index > -1)
             value = value.substr(0, index);
 
-          dataMap.set(vsplit.split('|')[0], value)
+          dataMap.set(vsplit.split('|')[0], value.trim())
         }
       }
 
@@ -105,6 +105,16 @@ module.exports = {
               return p.reconstruct();
             }
           };
+
+          p.create()
+            .string('SetHasGrowID')
+            .int(1)
+            .string(dataMap.get('tankIDName'))
+            .string(dataMap.get('tankIDPass'))
+            .end()
+
+          main.Packet.sendPacket(peerid, p.return().data, p.return().len);
+          p.reconstruct();
         }
 
         let player;

@@ -70,4 +70,5 @@ module.exports = function(main, packet, peerid, p) {
 
   main.Packet.onPeerConnect(peerid);
   main.Packet.sendInventory(peerid);
+  main.Packet.sendSound(peerid, "audio/door_open.wav", 0);
 };
