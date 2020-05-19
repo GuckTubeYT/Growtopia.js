@@ -67,6 +67,15 @@ module.exports = function(main, packet, peerid, p) {
         let clothes = Object.entries(player.clothes);
         let equipped = clothes.filter(c => c[1] === data.plantingTree)[0];
         player.clothes[equipped[0]] = 0;
+
+        switch(item.clothingType) {
+          case 6: {
+            if (wings.includes(data.plantingTree))
+              player.removeState('canDoubleJump')
+            
+            break;
+          }
+        }
         
         for (let i = 0; i < clothes.length; i++) {
           let itemName = main.getItems().get(clothes[i][1]).name;
@@ -152,6 +161,7 @@ module.exports = function(main, packet, peerid, p) {
       let player = main.players.get(peerid);
       let world = main.worlds.get(player.currentWorld);
 
+      if (main.getItems().get(data.plantingTree).actionType === 1) return;
       if (main.getItems().get(data.plantingTree).actionType === 20) return;
 
       if (data.plantingTree === 18) {
