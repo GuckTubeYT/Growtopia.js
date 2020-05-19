@@ -129,7 +129,7 @@ module.exports = function(main, packet, peerid, p) {
 
       if (data.plantingTree === 18) {
         let block;
-        
+
         if (world.items[x + (y * world.width)].background > 0)
           block = world.items[x + (y * world.width)].background;
         else if (world.items[x + (y * world.width)].foreground > 0)
@@ -150,7 +150,7 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-        
+
         if (type === 18)
           world.items[x + (y * world.width)].background = 0;
         else if (type === 17)
