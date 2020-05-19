@@ -1,4 +1,5 @@
 const PlayerInventory = require('./PlayerInventory');
+const Constants = require('./Constants');
 
 class PlayerInfo {
 	#main;
@@ -47,6 +48,7 @@ class PlayerInfo {
 		this.hasClothesUpdated = false;
 
 		this.states = [];
+		this.punchEffect = 0x808000;
 	}
 
 	addState(state) {
@@ -64,6 +66,28 @@ class PlayerInfo {
 		state |= this.states.includes('isInvis') << 2;
 
 		return state;
+	}
+
+	removeState(state) {
+		this.states = this.states.filter(s => s !== state);
+		this.#main.players.set(this.temp.peerid, this);
+	}
+
+	addRole(role) {
+		role = role.toLowerCase();
+
+		if (!Constants.Permissions[role])
+			return 1; // err no role exists
+		else if (this.roles.includes(role))
+			return 2; // user has role
+		else {
+			this.permissions |= Constants.Permission[role];
+			//this.roles = this.roles.filter(r => r.toLowerCase() === role);
+			this.roles.push(role);
+
+			this.#main.players.set(this.temp.peerid, this);
+			return 3; // success
+		}
 	}
 };
 

@@ -402,8 +402,8 @@ class Packet {
 
       let packedData = this.packPlayerMoving(data);
 
-      let v = 0x808000;
-      packedData.writeUIntLE(v, 1, 3);
+      let effect = player.punchEffect;
+      packedData.writeUIntLE(effect, 1, 3);
       let waterSpeed = 125.0;
       packedData.writeFloatLE(waterSpeed, 16, 4);
 

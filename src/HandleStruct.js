@@ -63,6 +63,30 @@ module.exports = function(main, packet, peerid, p) {
       let item = main.getItems().get(data.plantingTree);
       let player = main.players.get(peerid);
 
+      if (Object.values(player.clothes).includes(data.plantingTree)) {
+        let clothes = Object.entries(player.clothes);
+        let equipped = clothes.filter(c => c[1] === data.plantingTree)[0];
+        player.clothes[equipped[0]] = 0;
+        
+        for (let i = 0; i < clothes.length; i++) {
+          let itemName = main.getItems().get(clothes[i][1]).name;
+
+          if (Constants.ItemEffects[itemName] && itemName !== item.name) {
+            player.punchEffect = Constants.ItemEffects[itemName];
+          } else {
+            if (!player.punchEffect || player.punchEffect === Constants.ItemEffects[item.name])
+              player.punchEffect = Constants.ItemEffects.Fist;
+          }
+        }
+
+        main.players.set(peerid, player);
+        main.Packet.sendClothes(peerid);
+        return main.Packet.sendState(peerid);
+      } else {
+        if (Constants.ItemEffects[item.name])
+          player.punchEffect = Constants.ItemEffects[item.name];
+      }
+
       switch(item.clothingType) {
         case 0: {
           player.clothes.hair = data.plantingTree;
@@ -117,6 +141,7 @@ module.exports = function(main, packet, peerid, p) {
 
       main.players.set(peerid, player);
       main.Packet.sendClothes(peerid);
+      main.Packet.sendState(peerid);
       break;
     }
 

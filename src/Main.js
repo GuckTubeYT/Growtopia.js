@@ -43,7 +43,7 @@ class Main extends EventEmitter {
       let file = require(`${this.commandsDir}/${files[i]}`);
       if (!file.requiredPerms && isNaN(file.requiredPerms))
         file.requiredPerms = 0;
-        
+
       this.commands.set(file.name, file);
 
       console.log(`Loaded ${file.name} command`);
@@ -247,7 +247,10 @@ class Main extends EventEmitter {
    */
 
   GetMessage(packet) {
-    return Buffer.from(packet).toString('utf-8', 4);
+    let buffer = Buffer.from(packet);
+    buffer.writeIntLE(0, buffer.length - 1, 1);
+
+    return buffer.toString('utf-8', 4);
   }
 
   /**

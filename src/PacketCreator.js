@@ -131,7 +131,6 @@ class PacketCreator {
 
   end() {
     this.data = Buffer.concat([this.data, Buffer.from([0x00])]);
-    this.data.writeUIntLE(0, this.len, 1);
     this.len++;
 
     this.data.writeUIntLE(this.indexes, 56, 1);
