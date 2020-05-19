@@ -1,5 +1,7 @@
 const PlayerInventory = require('./PlayerInventory');
 const Constants = require('./Constants');
+const PacketCreator = require('../PacketCreator');
+let p = new PacketCreator();
 
 class PlayerInfo {
 	#main;
@@ -74,20 +76,61 @@ class PlayerInfo {
 	}
 
 	addRole(role) {
+
 		role = role.toLowerCase();
 
 		if (!Constants.Permissions[role])
 			return 1; // err no role exists
 		else if (this.roles.includes(role))
 			return 2; // user has role
+		else if (this.isGuest)
+			return 3;
 		else {
-			this.permissions |= Constants.Permission[role];
-			//this.roles = this.roles.filter(r => r.toLowerCase() === role);
+			this.permissions = Constants.Permissions[role];
 			this.roles.push(role);
 
+			let dialog = this.#main.Dialog.defaultColor()
+				.addLabelWithIcon("WARNING", '', 'small')
+				.addTextBox("`wPLEASE LEAVE AND ENTER. THANKS.")
+				.addQuickExit();
+
+			p.create()
+					.string('OnDialogRequest')
+					.string(dialog.str())
+					.end();
+
+			this.#main.Packet.sendPacket(this.temp.peerid, p.return().data, p.return().len);
+		  p.reconstruct();
+			dialog.reconstruct();
+
 			this.#main.players.set(this.temp.peerid, this);
-			return 3; // success
+			return 4; // success
 		}
+	}
+
+		resetRole() {
+      if (!this.isGuest) {
+
+			  this.permissions = 1;
+				this.roles = ['user'];
+
+				let dialog = this.#main.Dialog.defaultColor()
+					.addLabelWithIcon("WARNING", '', 'small')
+					.addTextBox("`wPLEASE LEAVE AND ENTER. THANKS.")
+					.addQuickExit();
+
+				p.create()
+						.string('OnDialogRequest')
+						.string(dialog.str())
+						.end();
+
+				this.#main.Packet.sendPacket(this.temp.peerid, p.return().data, p.return().len);
+				p.reconstruct();
+				dialog.reconstruct();
+
+				this.#main.players.set(this.temp.peerid, this);
+				return true;
+			}
 	}
 };
 
