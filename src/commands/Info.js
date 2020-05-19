@@ -9,7 +9,7 @@ module.exports = {
     for (let playerData of keys) {
       if (playerData === 'temp')
         continue;
-        
+
       msg += `\`o${playerData}: \`w${player[playerData]}\`o${keys.indexOf(playerData) === keys.length - 1 ? '' : '\n'}`;
     }
 
