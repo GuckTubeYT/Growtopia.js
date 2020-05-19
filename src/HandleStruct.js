@@ -67,7 +67,16 @@ module.exports = function(main, packet, peerid, p) {
         let clothes = Object.entries(player.clothes);
         let equipped = clothes.filter(c => c[1] === data.plantingTree)[0];
         player.clothes[equipped[0]] = 0;
-        
+
+        switch(item.clothingType) {
+          case 6: {
+            if (wings.includes(data.plantingTree))
+              player.removeState('canDoubleJump')
+
+            break;
+          }
+        }
+
         for (let i = 0; i < clothes.length; i++) {
           let itemName = main.getItems().get(clothes[i][1]).name;
 
@@ -156,10 +165,10 @@ module.exports = function(main, packet, peerid, p) {
 
       if (data.plantingTree === 18) {
         let block;
-        
+
         if (world.items[x + (y * world.width)].background > 0)
           block = world.items[x + (y * world.width)].background;
-        
+
         if (world.items[x + (y * world.width)].foreground > 0)
           block = world.items[x + (y * world.width)].foreground;
 
@@ -181,7 +190,7 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-        
+
         if (type === 18)
           world.items[x + (y * world.width)].background = 0;
         else if (type === 17 ||type === 15)
