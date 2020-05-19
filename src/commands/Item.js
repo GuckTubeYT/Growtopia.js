@@ -22,7 +22,6 @@ module.exports = {
 
     obj.itemID = parseInt(item);
     obj.itemCount = parseInt(amount);
-    console.log(inv.items.filter(i => i.itemID === obj.itemID));
 
     if (inv.items.filter(i => i.itemID === obj.itemID).length < 1)
       inv.items.push(obj);
