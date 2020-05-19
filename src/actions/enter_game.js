@@ -23,7 +23,7 @@ module.exports = function(main, packet, peerid, p) {
     .addSpacer("small")
     .addTextBox("Our Discord: https://discord.gg/3NrVX8s!")
     .addSpacer("small")
-    .addTextBox("Built by Alexander9673 and lukeawarmcat!")
+    .addTextBox("Built by Alexander9673 and lukewarmcat!")
     .endDialog("gazette", "", "OK");
 
   p.create()

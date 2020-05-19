@@ -1,8 +1,12 @@
 module.exports = function(main, packet, peerid, p) {
   let netID = packet.get('netid');
   let player = main.players.get(peerid);
+  let playerRole = player.roles[player.roles.length - 1];
+  playerRole[0] = playerRole[0].toUpperCase();
+
   let dialog = main.Dialog.defaultColor()
-    .addLabelWithIcon(`\`wHello ${player.tankIDName}`, '', 'small')
+    .addLabelWithIcon(player.tankIDName ? player.tankIDName : player.requestedName, '', 'small')
+    .addTextBox(`This user is a ${playerRole}.`)
     .addQuickExit();
 
   if (netID && !isNaN(netID)) {
