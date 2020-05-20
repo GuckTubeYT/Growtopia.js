@@ -1,11 +1,9 @@
-const Packet = require('./Packet');
 const Constants = require('./structs/Constants');
 const wings = [156, 350, 362, 678, 736, 818, 1166, 1206, 1460, 1550, 1574, 1672, 1674, 1738, 1780, 1784, 1824, 1934, 1936, 1938, 1970, 2158, 2160, 2162, 2164, 2166, 2168, 2254, 2256, 2258, 2260, 2262, 2264, 2438, 2538, 2642, 2722, 2776, 2930, 2932, 2982, 3104, 3112, 3114, 3120, 3134, 3134, 3144, 3308, 3442, 3512, 3858, 4184, 4412, 4414, 4534, 4628, 4970, 4972, 4986, 5020, 5322, 5738, 5754, 6004, 6144, 6284, 6334, 6694, 6758, 6818, 6842, 7104, 7350, 7582, 9394];
 
 module.exports = function(main, packet, peerid, p) {
-  const PacketHandler = new Packet(main);
-  const type = PacketHandler.GetStructPointerFromTankPacket(packet);
-  const data = PacketHandler.unpackPlayerMoving(packet);
+  const type = main.Packet.GetStructPointerFromTankPacket(packet);
+  const data = main.Packet.unpackPlayerMoving(packet);
 
   switch(type) {
     case 0: {
@@ -31,30 +29,29 @@ module.exports = function(main, packet, peerid, p) {
 
           if (!main.Host.isInSameWorld(peerid, peers[i]))
             continue;
-
-          main.Packet.sendState(peers[i]);
         }
       }
 
       main.players.set(peerid, player);
-      PacketHandler.sendPData(peerid, data);
+      main.Packet.sendPData(peerid, data);
 
       if (!player.hasClothesUpdated) {
         player.hasClothesUpdated = true;
         main.players.set(peerid, player);
         main.Packet.updateAllClothes(peerid);
+        main.Packet.sendState(peerid);
       }
       break;
     }
 
     case 18: {
-      PacketHandler.sendPData(peerid, data);
+      main.Packet.sendPData(peerid, data);
       break;
     }
 
     case 7: {
-      PacketHandler.sendPlayerLeave(peerid);
-      PacketHandler.requestWorldSelect(peerid);
+      main.Packet.sendPlayerLeave(peerid);
+      main.Packet.requestWorldSelect(peerid);
       main.Packet.sendSound(peerid, "audio/door_shut.wav", 0);
       break;
     }
@@ -72,27 +69,50 @@ module.exports = function(main, packet, peerid, p) {
           case 6: {
             if (wings.includes(data.plantingTree))
               player.removeState('canDoubleJump')
-          
-          break;
+            break;
           }
         }
-        for (let i = 0; i < clothes.length; i++) {
-          let itemName = main.getItems().get(clothes[i][1]).name;
 
-          if (Constants.ItemEffects[itemName] && itemName !== item.name) {
-            player.punchEffect = Constants.ItemEffects[itemName];
-          } else {
-            if (!player.punchEffect || player.punchEffect === Constants.ItemEffects[item.name])
-              player.punchEffect = Constants.ItemEffects.Fist;
-          }
-        }
+        if (Constants.ItemEffects[item.name] && player.punchEffects.includes(item.name))
+          player.removePunchEffect(item.name);
 
         main.players.set(peerid, player);
         main.Packet.sendClothes(peerid);
         return main.Packet.sendState(peerid);
       } else {
-        if (Constants.ItemEffects[item.name])
-          player.punchEffect = Constants.ItemEffects[item.name];
+        if (Constants.ItemEffects[item.name] && !player.punchEffects.includes(item.name)) {
+          let itemData = [];
+
+          for (let [k, v] of main.getItems()) {
+            if (v.name === item.name)
+              itemData.push(v);
+            else continue;
+          }
+
+          if (itemData.length > 0) {
+            //console.log(itemData)
+            let type = itemData[0].clothingType;
+
+            for (let i = 0; i < player.punchEffects.length; i++) {
+              itemData = [];
+
+              for (let [k, v] of main.getItems()) {
+                if (v.name === player.punchEffects[i])
+                  itemData.push(v);
+                else continue;
+              }
+
+              for (let j = 0; j < itemData.length; j++) {
+                if (itemData[j].clothingType === type) {
+                  if (itemData[j].name !== 'Fist')
+                    player.removePunchEffect(itemData[j].name);
+                }
+
+                player.addPunchEffect(item.name);
+              }
+            }
+          }
+        }
       }
 
       switch(item.clothingType) {
@@ -160,15 +180,15 @@ module.exports = function(main, packet, peerid, p) {
       let player = main.players.get(peerid);
       let world = main.worlds.get(player.currentWorld);
 
-      if (main.getItems().get(data.plantingTree).actionType === 1) return;
       if (main.getItems().get(data.plantingTree).actionType === 20) return;
+      if (main.getItems().get(data.plantingTree).actionType === 1) return;
 
       if (data.plantingTree === 18) {
         let block;
-
+        
         if (world.items[x + (y * world.width)].background > 0)
           block = world.items[x + (y * world.width)].background;
-
+        
         if (world.items[x + (y * world.width)].foreground > 0)
           block = world.items[x + (y * world.width)].foreground;
 
@@ -190,7 +210,7 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-
+        
         if (type === 18)
           world.items[x + (y * world.width)].background = 0;
         else if (type === 17 ||type === 15)

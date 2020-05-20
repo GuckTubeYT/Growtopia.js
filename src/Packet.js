@@ -49,7 +49,20 @@ class Packet {
    * @returns {undefined}
    */
 
-  sendQuit(peerid, willDelete) {
+  sendQuit(peerid, saveItems = false) {
+      if (saveItems) {
+        let player = this.#main.players.get(peerid);
+
+        if (player) {
+          player.hasClothesUpdated = false;
+          this.#main.playersDB.set(player.rawName, player);
+          this.#main.players.delete(peerid);
+
+          if (this.#main.Host.checkIfConnected(peerid))
+            return this.#main.getModule().Packets.quit(peerid);
+        }
+      }
+
       return this.#main.getModule().Packets.quit(peerid);
   }
 
@@ -402,8 +415,9 @@ class Packet {
 
       let packedData = this.packPlayerMoving(data);
 
-      let effect = player.punchEffect;
+      let effect = Constants.ItemEffects[player.punchEffects[player.punchEffects.length - 1]];
       packedData.writeUIntLE(effect, 1, 3);
+      
       let waterSpeed = 125.0;
       packedData.writeFloatLE(waterSpeed, 16, 4);
 

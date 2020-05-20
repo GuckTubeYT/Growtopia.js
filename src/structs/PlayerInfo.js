@@ -50,7 +50,7 @@ class PlayerInfo {
 		this.hasClothesUpdated = false;
 
 		this.states = [];
-		this.punchEffect = 0x808000;
+		this.punchEffects = ["Fist"];
 	}
 
 	addState(state) {
@@ -75,62 +75,18 @@ class PlayerInfo {
 		this.#main.players.set(this.temp.peerid, this);
 	}
 
-	addRole(role) {
+	addPunchEffect(effect) {
+		if (Constants.ItemEffects[effect] && !this.punchEffects.includes(effect))
+			this.punchEffects.push(effect);
 
-		role = role.toLowerCase();
-
-		if (!Constants.Permissions[role])
-			return 1; // err no role exists
-		else if (this.roles.includes(role))
-			return 2; // user has role
-		else if (this.isGuest)
-			return 3;
-		else {
-			this.permissions = Constants.Permissions[role];
-			this.roles.push(role);
-
-			let dialog = this.#main.Dialog.defaultColor()
-				.addLabelWithIcon("WARNING", '', 'small')
-				.addTextBox("`wPLEASE LEAVE AND ENTER. THANKS.")
-				.addQuickExit();
-
-			p.create()
-					.string('OnDialogRequest')
-					.string(dialog.str())
-					.end();
-
-			this.#main.Packet.sendPacket(this.temp.peerid, p.return().data, p.return().len);
-		  p.reconstruct();
-			dialog.reconstruct();
-
-			this.#main.players.set(this.temp.peerid, this);
-			return 4; // success
-		}
+		this.#main.players.set(this.temp.peerid, this);
 	}
 
-		resetRole() {
-      if (!this.isGuest) {
+	removePunchEffect(effect) {
+		if (this.punchEffects.includes(effect))
+			this.punchEffects = this.punchEffects.filter(p => p.toLowerCase() !== effect.toLowerCase());
 
-			  this.permissions = 1;
-				this.roles = ['user'];
-
-				let dialog = this.#main.Dialog.defaultColor()
-					.addLabelWithIcon("WARNING", '', 'small')
-					.addTextBox("`wPLEASE LEAVE AND ENTER. THANKS.")
-					.addQuickExit();
-
-				p.create()
-						.string('OnDialogRequest')
-						.string(dialog.str())
-						.end();
-
-				this.#main.Packet.sendPacket(this.temp.peerid, p.return().data, p.return().len);
-				p.reconstruct();
-				dialog.reconstruct();
-
-				this.#main.players.set(this.temp.peerid, this);
-				return true;
-			}
+		this.#main.players.set(this.temp.peerid, this);
 	}
 };
 

@@ -35,7 +35,7 @@ module.exports = function(main, packet, peerid, p) {
       let password = packet.get('password');
       let email = packet.get('email');
 
-      if (!username.match(/^\W+/g)) {
+      if (username.match(/\W+/g) && username.match(/\W+/g).length > 0) {
         p.create()
           .string('OnConsoleMessage')
           .string('Username cannot be empty or contain symbols.')
@@ -90,7 +90,7 @@ module.exports = function(main, packet, peerid, p) {
       main.Packet.sendPacket(peerid, p.return().data, p.return().len);
       p.reconstruct();
 
-      main.Packet.sendQuit(peerid);
+      main.Packet.sendQuit(peerid, true);
 
       break;
     }

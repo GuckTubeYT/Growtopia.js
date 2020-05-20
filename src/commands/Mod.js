@@ -1,5 +1,6 @@
 module.exports = {
   name: 'mod',
+  requiredPerms: 1,
   run: function(main, arguments, peerid, p) {
     let player = main.players.get(peerid);
     if (player.states.includes('canWalkInBlocks')) {

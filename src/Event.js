@@ -78,7 +78,7 @@ module.exports = {
           user = user.toLowerCase();
           let errorMsg = '`4Unable to log on:`o That `wGrowID `odoesn\'t seem valid, or the password is wrong. If you don\'t have one, press `wCancel`o, un-check `w\'I have a GrowID\'`o, then click `wConnect`o.';
           // logged in as account
-          if (!(await main.playersDB.has(user))) {
+          if (!(await main.playersDB.has(user)) || !dataMap.has('tankIDPass')) {
             // no account found
             p.create()
               .string('OnConsoleMessage')
@@ -115,7 +115,26 @@ module.exports = {
 
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           p.reconstruct();
-        }
+        } else {
+          // no growid
+          p.create()
+            .string('OnConsoleMessage')
+            .string('This is a Guest account where almost everything can\'t be used.')
+            .end();
+
+          main.Packet.sendPacket(peerid, p.return().data, p.return().len);
+          p.reconstruct();
+
+          p.create()
+            .string('SetHasGrowID')
+            .int(0)
+            .string(dataMap.get('tankIDName') || '')
+            .string(dataMap.get('tankIDPass') || '')
+            .end();
+
+          main.Packet.sendPacket(peerid, p.return().data, p.return().len);
+          p.reconstruct();
+        };
 
         let player;
         let fromDb = false;
