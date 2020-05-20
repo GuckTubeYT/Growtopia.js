@@ -266,7 +266,8 @@ class Main extends EventEmitter {
     try {
       file = readFileSync(location);
     } catch (e) {
-      throw new Error("Can't open items.dat, maybe it's not there?");
+      console.error("Error: Can't open items.dat, maybe it's not there?");
+	  process.exit(e.code);
     }
 
     for (let i = 0; i < file.length; i++) {
