@@ -1,16 +1,12 @@
-const {
-  EventEmitter
-} = require('events');
-const {
-  readFileSync,
-  readdirSync,
-  statSync
-} = require('fs');
+const { EventEmitter } = require('events');
+const { readFileSync, readdirSync, statSync } = require('fs');
 const WorldItem = require('./structs/WorldItem');
 const WorldInfo = require('./structs/WorldInfo');
 const CONSTANTS = require('./structs/Constants');
 const PacketCreator = require('./PacketCreator');
 const Endb = require('enmap');
+const { exec } = require('child_process');
+
 let p = new PacketCreator();
 let netID = 0;
 let items = new Map();
@@ -28,6 +24,7 @@ let items = new Map();
  * @prop {String} options.location The location of the items.dat file.
  * @prop {String} options.cdn The cdn content to use.
  * @prop {String} options.secretKey The secret key to use for passwords, PLEASE CHANGE THIS
+ * @prop {Boolean} options.autoWeb This will run the webserver on a separate process so that you don't have to run "web.js"
  */
 
 class Main extends EventEmitter {
@@ -49,10 +46,19 @@ class Main extends EventEmitter {
       console.log(`Loaded ${file.name} command`);
     }
   }
+
   #loadWorldsToCache = function() {
     for (let [name, world] of this.worldsDB) {
+      world.breakLevel = 0;
       this.worlds.set(name, world);
     }
+  }
+
+  #startWebserver = function() {
+    exec('node web.js', function(error, out, input) {
+      if (error) 
+        throw new Error(error);
+    });
   }
 
   constructor(options = {}) {
@@ -98,6 +104,10 @@ class Main extends EventEmitter {
 
       secret: {
         value: options.secretKey || 'growtopia.js'
+      },
+
+      autoWeb: {
+        value: options.autoWeb || false
       },
 
       /**
@@ -188,6 +198,9 @@ class Main extends EventEmitter {
     this.netID = netID;
     this.#loadCommands();
     this.#loadWorldsToCache();
+
+    if (this.autoWeb)
+      this.#startWebserver();
   }
 
   /**
@@ -283,6 +296,7 @@ class Main extends EventEmitter {
    */
 
   buildItemsDatabase(location) {
+    // credits to MrAugu
     let file;
     let secret = 'PBG892FXX982ABC*';
 

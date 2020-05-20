@@ -527,11 +527,14 @@ class Packet {
     }
   }
 
-  sendNothing(peerid, x, y) {
+  sendNothing(peerid, x, y, plantingTree, netID) {
+    if (typeof netID !== 'number')
+      netID = -1;
+
     let data = new PlayerMoving();
-    data.packetType = 0x08;
-    data.plantingTree = 0;
-    data.netID = -1;
+    data.packetType = 0x8;
+    data.plantingTree = plantingTree || 0;
+    data.netID = netID;
     data.x = x;
     data.y = y;
     data.punchX = x;

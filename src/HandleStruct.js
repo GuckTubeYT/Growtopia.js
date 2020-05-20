@@ -1,4 +1,5 @@
 const Constants = require('./structs/Constants');
+const PlayerMoving = require('./structs/PlayerMoving');
 const wings = [156, 350, 362, 678, 736, 818, 1166, 1206, 1460, 1550, 1574, 1672, 1674, 1738, 1780, 1784, 1824, 1934, 1936, 1938, 1970, 2158, 2160, 2162, 2164, 2166, 2168, 2254, 2256, 2258, 2260, 2262, 2264, 2438, 2538, 2642, 2722, 2776, 2930, 2932, 2982, 3104, 3112, 3114, 3120, 3134, 3134, 3144, 3308, 3442, 3512, 3858, 4184, 4412, 4414, 4534, 4628, 4970, 4972, 4986, 5020, 5322, 5738, 5754, 6004, 6144, 6284, 6334, 6694, 6758, 6818, 6842, 7104, 7350, 7582, 9394];
 
 module.exports = function(main, packet, peerid, p) {
@@ -90,7 +91,6 @@ module.exports = function(main, packet, peerid, p) {
           }
 
           if (itemData.length > 0) {
-            //console.log(itemData)
             let type = itemData[0].clothingType;
 
             for (let i = 0; i < player.punchEffects.length; i++) {
@@ -179,6 +179,17 @@ module.exports = function(main, packet, peerid, p) {
 
       let player = main.players.get(peerid);
       let world = main.worlds.get(player.currentWorld);
+      let _data = new PlayerMoving();
+      _data.x = x;
+      _data.y = y;
+      _data.punchX = x;
+      _data.punchY = y;
+      _data.xSpeed = 0;
+      _data.ySpeed = 0;
+      _data.netID = player.netID;
+      _data.plantingTree = data.plantingTree;
+
+      data.netID = player.netID;
 
       if (main.getItems().get(data.plantingTree).actionType === 20) return;
       if (main.getItems().get(data.plantingTree).actionType === 1) return;
@@ -210,11 +221,46 @@ module.exports = function(main, packet, peerid, p) {
           main.Packet.sendPacket(peerid, p.return().data, p.return().len);
           return p.reconstruct();
         }
-        
-        if (type === 18)
-          world.items[x + (y * world.width)].background = 0;
-        else if (type === 17 ||type === 15)
-          world.items[x + (y * world.width)].foreground = 0;
+          let worldBlock = world.items[x + (y * world.width)];
+          let punchedBlock = main.getItems().get(worldBlock.foreground > 0 ? worldBlock.foreground : worldBlock.background);
+
+          if (punchedBlock) {
+            
+            if (worldBlock.breakLevel < (punchedBlock.breakHits / 6) - 1) {
+              // not destroyed yet
+              worldBlock.breakLevel++;
+
+              _data.packetType = 0x8;
+              _data.plantingTree = worldBlock.breakLevel + 1;
+
+              setTimeout(() => {
+                if (worldBlock.breakLevel !== worldBlock.breakLevel + 1) {
+                  // clear it
+                  worldBlock.breakLevel = 0;
+                }
+              }, 12000);
+
+              world.items[x + (y * world.width)] = worldBlock;
+              main.worlds.set(world.name, world);
+
+              for (let peer of [...main.players.keys()]) {
+                if (main.Host.isInSameWorld(peerid, peer) && main.Host.checkIfConnected(peer)) {
+                  main.Packet.sendNothing(peer, x, y, _data.plantingTree, player.netID);
+                }
+              }
+
+              return;
+            } else if (worldBlock.breakLevel >= (punchedBlock.breakHits / 6) - 1) {
+              if (worldBlock.foreground > 0)
+                worldBlock.foreground = 0;
+              else if (worldBlock.background > 0)
+                worldBlock.background = 0;
+
+              worldBlock.breakLevel = 0;
+              world.items[x + (y * world.width)] = worldBlock;
+              main.worlds.set(world.name, world);
+            }
+          }
       } else {
         let items = player.inventory.items;
         for (let i = 0; i < items.length; i++) {

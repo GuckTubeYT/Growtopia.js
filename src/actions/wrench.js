@@ -1,6 +1,15 @@
 module.exports = function(main, packet, peerid, p) {
   let netID = packet.get('netid');
-  let player = main.players.get(peerid);
+  netID = parseInt(netID);
+  let player = [];
+
+  for (let [i, p] of main.players) {
+    if (p.netID === netID)
+      player.push(p);
+  }
+
+  player = player[0];
+
   let playerRole = player.roles[player.roles.length - 1];
   playerRole[0] = playerRole[0].toUpperCase();
 
@@ -10,17 +19,13 @@ module.exports = function(main, packet, peerid, p) {
     .addQuickExit();
 
   if (netID && !isNaN(netID)) {
-    netID = parseInt(netID);
-    if (player.netID === netID) {
-      // wrenched yourself
-      p.create()
-        .string('OnDialogRequest')
-        .string(dialog.str())
-        .end();
+    p.create()
+      .string('OnDialogRequest')
+      .string(dialog.str())
+      .end();
 
-      main.Packet.sendPacket(peerid, p.return().data, p.return().len);
-      p.reconstruct();
-      dialog.reconstruct();
-    }
+    main.Packet.sendPacket(peerid, p.return().data, p.return().len);
+    p.reconstruct();
+    dialog.reconstruct();
   }
 }
