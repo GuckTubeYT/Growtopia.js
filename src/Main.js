@@ -10,6 +10,12 @@ const WorldItem = require('./structs/WorldItem');
 const WorldInfo = require('./structs/WorldInfo');
 const CONSTANTS = require('./structs/Constants');
 const PacketCreator = require('./PacketCreator');
+try {
+    require.resolve("enmap");
+} catch(e) {
+    console.error("enmap is not found, please install with type 'npm install enmap'");
+	process.exit(0);
+}
 const Endb = require('enmap');
 let p = new PacketCreator();
 let netID = 0;
