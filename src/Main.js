@@ -10,16 +10,19 @@ const WorldItem = require('./structs/WorldItem');
 const WorldInfo = require('./structs/WorldInfo');
 const CONSTANTS = require('./structs/Constants');
 const PacketCreator = require('./PacketCreator');
-try {
-    require.resolve("enmap");
-} catch(e) {
-    console.error("enmap is not found, please install with type 'npm install enmap'");
-	process.exit(0);
-}
-const Endb = require('enmap');
 let p = new PacketCreator();
 let netID = 0;
 let items = new Map();
+
+// Check if enmap exists
+try {
+  require.resolve("enmap");
+} catch(e) {
+  console.error("enmap cannot be found. Please install it with 'npm install enmap'");
+  process.exit(0);
+}
+
+const Endb = require('enmap');
 
 /**
  * The Main Class is the file that you would require to handle everything.
