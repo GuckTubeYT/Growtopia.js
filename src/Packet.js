@@ -75,7 +75,7 @@ class Packet {
    */
 
   sendPacket(peerid, packet, length) {
-    this.#main.getModule().Packets.sendPacket(peerid, packet, length || packet.length);
+   return this.#main.getModule().Packets.sendPacket(peerid, packet, length || packet.length);
   }
 
   /**
@@ -89,7 +89,7 @@ class Packet {
    */
 
   sendPacketRaw(peerid, a1, data, size, a4) {
-    return this.#main.getModule().Packets.sendPacketRaw(peerid, a1, data, size, a4);
+     this.#main.getModule().Packets.sendPacketRaw(peerid, a1, data, size, a4);
   }
 
   /**
