@@ -75,7 +75,7 @@ class Packet {
    */
 
   sendPacket(peerid, packet, length) {
-    return this.#main.getModule().Packets.sendPacket(peerid, packet, length || packet.length);
+    this.#main.getModule().Packets.sendPacket(peerid, packet, length || packet.length);
   }
 
   /**
